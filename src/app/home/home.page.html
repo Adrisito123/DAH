@@ -1,0 +1,31 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Portal de Noticias</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="container mx-auto max-w-screen-xl">
+    
+    <app-header 
+      titulo="Noticias de Última Hora" 
+      subtitulo="La actualidad sin filtros desde la fuente">
+    </app-header>
+    
+    <div *ngIf="noticias.length > 0" 
+         class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4">
+      
+      <app-task-item 
+        *ngFor="let item of noticias; trackBy: trackById" 
+        [noticia]="item">
+      </app-task-item>
+    </div>
+
+    <div *ngIf="noticias.length === 0" class="ion-text-center mt-20 p-8 bg-white rounded-lg shadow-md">
+      <ion-icon name="alert-circle-outline" color="medium" class="text-4xl"></ion-icon>
+      <ion-text color="medium">
+        <p class="mt-4 text-lg">No se encontraron noticias. El array está vacío.</p>
+      </ion-text>
+    </div>
+  </div>
+</ion-content>
