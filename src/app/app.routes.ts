@@ -1,19 +1,16 @@
-import { Routes } from '@angular/router';
+// src/app/app.routes.ts
+import { Route } from '@angular/router';
+import { HomePage } from './home/home.page';
+import { DetalleNoticiaPage } from './pages/detalle-noticia/detalle-noticia.page';
 
-export const routes: Routes = [
+export const routes: Route[] = [
+  { path: '', redirectTo: 'home', pathMatch: 'full' },
   {
     path: 'home',
-    // Carga perezosa del componente HomePage
-    loadComponent: () => import('./home/home.page').then((m) => m.HomePage),
+    loadComponent: () => import('./home/home.page').then(m => m.HomePage),
   },
   {
-    path: 'detalle-noticia/:id',
-    // Carga perezosa de la página de detalles
-    loadComponent: () => import('./pages/detalle-noticia/detalle-noticia.page').then( m => m.DetalleNoticiaPage)
-  },
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full',
+    path: 'detalle/:id',
+    loadComponent: () => import('./pages/detalle-noticia/detalle-noticia.page').then(m => m.DetalleNoticiaPage),
   },
 ];

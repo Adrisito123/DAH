@@ -1,17 +1,41 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DetalleNoticiaPage } from './detalle-noticia.page';
+// src/app/pages/detalle-noticia/detalle-noticia.page.ts
+import { Component, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { IonicModule } from '@ionic/angular';
+import { ActivatedRoute } from '@angular/router';
+import { TaskService } from 'src/app/services/task.service';
+import { Noticia } from 'src/app/interfaces/noticia';
+import { AppHeaderComponent } from 'src/app/components/app-header/app-header.component';
 
-describe('DetalleNoticiaPage', () => {
-  let component: DetalleNoticiaPage;
-  let fixture: ComponentFixture<DetalleNoticiaPage>;
+@Component({
+  selector: 'app-detalle-noticia',
+  standalone: true,
+  imports: [CommonModule, IonicModule, AppHeaderComponent],
+  template: `
+<app-header titulo="Detalle Noticia"></app-header>
+<ion-content class="ion-padding">
+  <ion-card *ngIf="noticia">
+    <img [src]="noticia.imagenUrl" alt="{{noticia.titulo}}">
+    <ion-card-header>
+      <ion-card-title>{{noticia.titulo}}</ion-card-title>
+      <ion-card-subtitle>{{noticia.autor | uppercase}}</ion-card-subtitle>
+      <p>Publicado: {{noticia.fechaPublicacion | date:'dd MMM yyyy'}}</p>
+    </ion-card-header>
+    <ion-card-content>
+      <p>{{noticia.resumen}}</p>
+    </ion-card-content>
+  </ion-card>
+  <p *ngIf="!noticia">Noticia no encontrada.</p>
+</ion-content>
+  `
+})
+export class DetalleNoticiaPage implements OnInit {
+  noticia: Noticia | undefined;
 
-  beforeEach(() => {
-    fixture = TestBed.createComponent(DetalleNoticiaPage);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  constructor(private route: ActivatedRoute, private taskService: TaskService) {}
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
-});
+  ngOnInit() {
+    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.noticia = this.taskService.getNoticiaById(id);
+  }
+}

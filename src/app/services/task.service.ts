@@ -1,11 +1,13 @@
+// src/app/services/task.service.ts
 import { Injectable } from '@angular/core';
 import { Noticia } from '../interfaces/noticia';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class TaskService {
- private noticias: Noticia[] = [
+
+  private noticias: Noticia[] = [
     {
       id: 1,
       titulo: 'Rashford (28) y Ansu Fati (23) cumplen años con números parecidos',
@@ -48,8 +50,8 @@ export class TaskService {
     },
     {
       id: 6,
-      titulo: 'Claudia Pina se desploma en FC 26: su precio se reduce a la mitad ',
-      resumen: 'Es la delantera de moda entre los jugadores de FC 26, pero Claudia Pina ha empezado a perder fuerza en el juego .',
+      titulo: 'Claudia Pina se desploma en FC 26: su precio se reduce a la mitad',
+      resumen: 'Es la delantera de moda entre los jugadores de FC 26, pero Claudia Pina ha empezado a perder fuerza en el juego.',
       autor: 'Marca',
       fechaPublicacion: new Date('2025/10/31'),
       imagenUrl: 'https://encrypted-tbn3.gstatic.com/licensed-image?q=tbn:ANd9GcQ4hU_J1UZHHbBFyJPeVM0WSTTtTfmBf1Izk6OYVRUUn23ZgWCPOn_vj768IHy6rP5IIdmFpxt_vWduJNk',
@@ -83,12 +85,14 @@ export class TaskService {
   }
 
   agregarNoticia(noticia: Noticia) {
-    if (!noticia.titulo.trim()) return;
+    if (!noticia.titulo?.trim()) return;
+
     const nueva: Noticia = {
       ...noticia,
       id: Date.now(),
       fechaPublicacion: new Date(),
     };
+
     this.noticias.unshift(nueva);
   }
 }
