@@ -1,31 +1,88 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>Portal de Noticias</ion-title>
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   <div class="container mx-auto max-w-screen-xl">
-    
+
     <app-header 
-      titulo="Noticias de Última Hora" 
-      subtitulo="La actualidad sin filtros desde la fuente">
+      titulo="Noticias de Última sobre futbol" 
+      subtitulo="La actualidad de lo mejor del deporte">
     </app-header>
-    
-    <div *ngIf="noticias.length > 0" 
-         class="grid gap-8 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 px-4">
-      
-      <app-task-item 
-        *ngFor="let item of noticias; trackBy: trackById" 
-        [noticia]="item">
-      </app-task-item>
+
+    <ion-fab vertical="top" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="toggleFormulario()" class="fab-transparente">
+        <span class="fab-plus">{{ mostrarFormulario ? '×' : '+' }}</span>
+      </ion-fab-button>
+    </ion-fab>
+
+    <div *ngIf="mostrarFormulario" class="formulario-desplegable">
+      <ion-list>
+        <ion-item>
+          <ion-input label="Título" label-placement="floating" placeholder="Título de la noticia"
+            [(ngModel)]="nuevaNoticia.titulo"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-textarea label="Resumen" label-placement="floating" placeholder="Resumen breve"
+            [(ngModel)]="nuevaNoticia.resumen"></ion-textarea>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="Autor" label-placement="floating" placeholder="Autor"
+            [(ngModel)]="nuevaNoticia.autor"></ion-input>
+        </ion-item>
+
+        <ion-item>
+          <ion-input label="URL de Imagen" label-placement="floating" placeholder="https://..."
+            [(ngModel)]="nuevaNoticia.imagenUrl"></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <ion-button expand="block" (click)="agregarNoticia()">
+        Añadir Noticia
+      </ion-button>
     </div>
 
-    <div *ngIf="noticias.length === 0" class="ion-text-center mt-20 p-8 bg-white rounded-lg shadow-md">
-      <ion-icon name="alert-circle-outline" color="medium" class="text-4xl"></ion-icon>
-      <ion-text color="medium">
-        <p class="mt-4 text-lg">No se encontraron noticias. El array está vacío.</p>
-      </ion-text>
+    <ion-grid *ngIf="cargando" class="px-4">
+      <ion-row>
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3"
+          *ngFor="let item of skeletons" class="ion-padding-bottom">
+          <ion-card>
+            <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
+            <ion-card-header>
+              <ion-card-subtitle><ion-skeleton-text animated style="width: 60px;"></ion-skeleton-text></ion-card-subtitle>
+              <ion-card-title><ion-skeleton-text animated style="width: 90%;"></ion-skeleton-text></ion-card-title>
+            </ion-card-header>
+            <ion-card-content>
+              <ion-skeleton-text animated style="width: 100%; height: 40px;"></ion-skeleton-text>
+            </ion-card-content>
+          </ion-card>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <h2 class="text-2xl font-bold text-gray-800 mb-4 px-4" *ngIf="!cargando && noticias.length > 0">Últimas Novedades</h2>
+    <ion-grid *ngIf="!cargando && noticias.length > 0" class="px-4">
+      <ion-row class="ion-align-items-start">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3"
+          *ngFor="let item of noticias; trackBy: trackById" class="ion-padding-bottom">
+          
+          <app-task-item 
+            [noticia]="item"
+            [cargando]="cargando"
+            (mostrarDetalles)="mostrarDetallesNoticia($event)"
+            (eliminarNoticia)="eliminarNoticia($event)"> 
+          </app-task-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div *ngIf="!cargando && noticias.length === 0" class="text-center ion-padding-top">
+        <h1 class="text-2xl font-bold text-gray-800">No hay noticias</h1>
+        <p class="text-gray-600">Añade una noticia para empezar.</p>
     </div>
+
   </div>
 </ion-content>

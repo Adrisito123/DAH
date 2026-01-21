@@ -1,98 +1,120 @@
-import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { IonicModule } from '@ionic/angular';
+import { Component } from '@angular/core';
+import { IonicModule, ToastController, AlertController } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
-import { TaskItemComponent } from '../components/task-item/task-item.component';
-import { AppHeaderComponent } from '../components/app-header/app-header.component'; // CLAVE: Importar el Componente de Cabecera (Mejora 2)
-
-// 1. Interfaz de Datos
-export interface Noticia {
-id: number;
-titulo: string;
-resumen: string;
-autor: string;
-fechaPublicacion: Date;
-imagenUrl: string;
-link?: string; 
-  esDestacada: boolean; // CLAVE: Propiedad para Estilos Dinámicos (Mejora 1)
-}
+import { TaskService } from '../services/task.service';
+import { Noticia } from '../interfaces/noticia';
+import { TaskItemComponent } from '../components/task-item/task-noticia.component';
+import { AppHeaderComponent } from '../components/app-header/app-header.component';
 
 @Component({
-selector: 'app-home',
-templateUrl: 'home.page.html',
-styleUrls: ['home.page.scss'],
+  selector: 'app-home',
+  standalone: true,
+  imports: [IonicModule, FormsModule, TaskItemComponent, AppHeaderComponent],
+  template: `
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>Inicio</ion-title>
+  </ion-toolbar>
+</ion-header>
 
-standalone: true,
-imports: [
-IonicModule, 
-CommonModule, 
-FormsModule,
-TaskItemComponent,
-    AppHeaderComponent // CLAVE: Añadir el Componente de Cabecera al imports
-] 
+<ion-content [fullscreen]="true" class="ion-padding">
+  <div class="container mx-auto max-w-screen-xl">
+    <app-header titulo="Noticias de Última sobre futbol" subtitulo="La actualidad de lo mejor del deporte"></app-header>
+
+    <ion-fab vertical="top" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="toggleFormulario()" class="fab-transparente">
+        <span class="fab-plus">{{ mostrarFormulario ? '×' : '+' }}</span>
+      </ion-fab-button>
+    </ion-fab>
+
+    <div *ngIf="mostrarFormulario" class="formulario-desplegable">
+      <ion-list>
+        <ion-item><ion-input label="Título" label-placement="floating" placeholder="Título de la noticia" [(ngModel)]="nuevaNoticia.titulo"></ion-input></ion-item>
+        <ion-item><ion-textarea label="Resumen" label-placement="floating" placeholder="Resumen breve" [(ngModel)]="nuevaNoticia.resumen"></ion-textarea></ion-item>
+        <ion-item><ion-input label="Autor" label-placement="floating" placeholder="Autor" [(ngModel)]="nuevaNoticia.autor"></ion-input></ion-item>
+        <ion-item><ion-input label="URL de Imagen" label-placement="floating" placeholder="https://..." [(ngModel)]="nuevaNoticia.imagenUrl"></ion-input></ion-item>
+      </ion-list>
+      <ion-button expand="block" (click)="agregarNoticia()">Añadir Noticia</ion-button>
+    </div>
+
+    <ion-grid *ngIf="!cargando && noticias.length > 0" class="px-4">
+      <ion-row class="ion-align-items-start">
+        <ion-col size="12" size-sm="6" size-md="4" size-lg="3" *ngFor="let item of noticias; trackBy: trackById" class="ion-padding-bottom">
+          <app-task-item [noticia]="item" [cargando]="cargando" (mostrarDetalles)="mostrarDetallesNoticia($event)" (eliminarNoticia)="eliminarNoticia($event)"></app-task-item>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div *ngIf="!cargando && noticias.length === 0" class="text-center ion-padding-top">
+      <h1 class="text-2xl font-bold text-gray-800">No hay noticias</h1>
+      <p class="text-gray-600">Añade una noticia para empezar.</p>
+    </div>
+  </div>
+</ion-content>
+  `,
 })
-export class HomePage implements OnInit {
+export class HomePage {
+  noticias: Noticia[] = [];
+  cargando = true;
+  mostrarFormulario = false;
+  nuevaNoticia: Partial<Noticia> = {};
+  skeletons = Array(8);
 
-public noticias: Noticia[] = [
-{
-id: 1,
-titulo: "Conflicto en Oriente Próximo",
-resumen: "Israel pinta una línea fronteriza dentro de Gaza y avisa de que “responderá con fuego” a quien intente traspasarla",
-autor: "El País",
-fechaPublicacion: new Date('2025-10-17'),
-imagenUrl: "https://imagenes.elpais.com/resizer/v2/4ABSRMNG2BD5VH7FE2OLV7ASNI.jpg?auth=f94792bf8f520611a099c02822bc39c0abd9879ef4c239d441e4e8a75d57c3e0&width=1200",
-      esDestacada: true, // CLAVE: Marcada como Destacada
-},
-{
-id: 2,
-titulo: "Cuando tu robot gane un premio Nobel",
-resumen: "No hay ningún problema de principio para que las máquinas diseñen otras máquinas, los sistemas generen otros sistemas y así hasta que la contribución humana no sea más que un lejano recuerdo",
-autor: "Javier Sampedro",
-fechaPublicacion: new Date('2025-10-16'),
-imagenUrl: "https://imagenes.elpais.com/resizer/v2/4XCIT3T32ZES5C6XTDFDM66LHY.JPG?auth=e24fd219ce7caf147eba3d34c483a62b838585b74105a018e0bbbf22d0c7bae0&width=1000",
-      esDestacada: false,
-},
-{
-id: 3,
-titulo: "Un nuevo negocio",
-resumen: "Inversores, portales inmobiliarios e intermediarios se lucran con la compraventa y desocupación de estos inmuebles, que apenas representan el 0,06% del parque total",
-autor: "Antonio NietoÁlvaro de la Rúa",
-fechaPublicacion: new Date('2025-10-15'),
-imagenUrl: "https://imagenes.elpais.com/resizer/v2/CW6ELPRSGRETHPAGF7NQSU6YNQ.jpg?auth=d72b37623ea3128d3e04ac3971e76df477aecc9e14989de4dcd73931a24cca82&width=828&height=466&smart=true",
-      esDestacada: true, // CLAVE: Marcada como Destacada
-},
-{
-id: 4,
-titulo: "Bolivia vuelve a las urnas",
-resumen: "El poder que conserva Evo Morales fuera de las instituciones tendrá un peso relevante en la gobernabilidad del país sea quien sea el ganador de la segunda vuelta",
-autor: "José Andrés Rojo",
-fechaPublicacion: new Date('2025-10-14'),
-imagenUrl: "https://imagenes.elpais.com/resizer/v2/CIVNYEO6RRKR3F6HHVQR5BWVVY.jpg?auth=a5ef6b77a23ebcbf90b43dba72214b306d9505e4a91b20988b755f885e7da1a4&width=1000",
-      esDestacada: false,
-}
-];
+  constructor(
+    private taskService: TaskService,
+    private toastController: ToastController,
+    private alertController: AlertController,
+    private router: Router
+  ) {}
 
-
-//Añadir propiedad: Agregamos esDestacada: boolean a la interfaz Noticia.
-//Asignar valor: Asignamos true o false a esta propiedad en tus datos de ejemplo.
-public isLoading: boolean = false; 
-
-constructor() {}
-
-  // CLAVE MEJORA 5: Propiedad calculada para el color de la cabecera
-  public get headerColorClass(): string {
-    // Busca si alguna noticia en la lista es destacada
-    const hayNoticiaDestacada = this.noticias.some(n => n.esDestacada);
-    
-    // Si la hay, devuelve la clase de alerta; si no, devuelve la clase estándar
-    return hayNoticiaDestacada ? "bg-red-700" : "bg-indigo-700";
+  ngOnInit() {
+    this.cargarNoticias();
+    setTimeout(() => this.cargando = false, 2000);
   }
 
-ngOnInit() {
-}
+  cargarNoticias() {
+    this.noticias = this.taskService.getNoticias();
+  }
 
-trackById(index: number, noticia: Noticia): number {
-return noticia.id;
-}
+  toggleFormulario() {
+    this.mostrarFormulario = !this.mostrarFormulario;
+  }
+
+  async agregarNoticia() {
+    if (!this.nuevaNoticia.titulo?.trim() || !this.nuevaNoticia.resumen?.trim()) {
+      const alert = await this.alertController.create({
+        header: 'Campos incompletos',
+        message: 'Por favor, completa el título y el resumen.',
+        buttons: ['OK'],
+      });
+      await alert.present();
+      return;
+    }
+
+    this.taskService.agregarNoticia(this.nuevaNoticia as Noticia);
+    this.nuevaNoticia = {};
+    this.cargarNoticias();
+    this.mostrarFormulario = false;
+
+    const toast = await this.toastController.create({
+      message: 'Noticia añadida correctamente',
+      duration: 2000,
+      position: 'top',
+    });
+    await toast.present();
+  }
+
+  trackById(index: number, item: Noticia) {
+    return item.id;
+  }
+
+  mostrarDetallesNoticia(noticia: Noticia) {
+    console.log('Detalles de noticia:', noticia);
+  }
+
+  eliminarNoticia(id: number) {
+    console.log('Eliminar noticia ID:', id);
+  }
 }

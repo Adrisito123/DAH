@@ -49,6 +49,20 @@
   --ion-color-danger-contrast-rgb: 255, 255, 255;
   --ion-color-danger-shade: #c12121;
   --ion-color-danger-tint: #df3b3b;
+
+  /* Fondo temático fútbol */
+ion-content {
+  /* Degradado de césped y cielo de estadio */
+  --background: linear-gradient(180deg, #51a0eb 0%, #3142a1 50%, #5c27a1 100%);
+  
+  position: relative;
+
+  /* Contenedor principal */
+  > .container {
+    position: relative;
+    z-index: 1;
+  }
+}
   
 
 }
