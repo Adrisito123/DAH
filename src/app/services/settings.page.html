@@ -1,0 +1,51 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Ajustes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="full">
+    
+    <ion-item-group>
+      <ion-item-divider>
+        <ion-label>Perfil de Usuario</ion-label>
+      </ion-item-divider>
+      
+      <ion-item>
+        <ion-icon name="person-outline" slot="start"></ion-icon>
+        <ion-label position="stacked">Tu Nombre</ion-label>
+        <ion-input 
+          [(ngModel)]="nombreUsuario" 
+          (ionInput)="guardarNombre()" 
+          placeholder="Escribe tu nombre">
+        </ion-input>
+      </ion-item>
+    </ion-item-group>
+
+    <ion-item-group class="ion-margin-top">
+      <ion-item-divider>
+        <ion-label>Apariencia</ion-label>
+      </ion-item-divider>
+
+      <ion-item>
+        <ion-icon name="moon-outline" slot="start"></ion-icon>
+        <ion-label>Modo Oscuro</ion-label>
+        <ion-toggle 
+          [checked]="isDark" 
+          (ionChange)="toggleChange($event)">
+        </ion-toggle>
+      </ion-item>
+    </ion-item-group>
+
+  </ion-list>
+
+  <div class="ion-padding-top ion-text-center">
+    <p style="font-size: 0.8em; color: gray;">
+      Los ajustes se guardan automáticamente.
+    </p>
+  </div>
+</ion-content>

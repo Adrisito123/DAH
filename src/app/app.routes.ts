@@ -1,7 +1,4 @@
-// src/app/app.routes.ts
-import { Route } from '@angular/router';
-import { HomePage } from './home/home.page';
-import { DetalleNoticiaPage } from './pages/detalle-noticia/detalle-noticia.page';
+import { Route, provideRouter } from '@angular/router';
 
 export const routes: Route[] = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -13,4 +10,10 @@ export const routes: Route[] = [
     path: 'detalle/:id',
     loadComponent: () => import('./pages/detalle-noticia/detalle-noticia.page').then(m => m.DetalleNoticiaPage),
   },
+  {
+    path: 'settings',
+    loadComponent: () => import('./services/settings.page').then(m => m.SettingsPage),
+  },
 ];
+
+export const appRoutes = provideRouter(routes);

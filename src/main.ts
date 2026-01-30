@@ -2,7 +2,10 @@ import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-import { Storage } from '@ionic/storage-angular';
+
+// IMPORTACIONES NECESARIAS
+import { provideHttpClient } from '@angular/common/http'; // Para el servidor REST
+import { IonicStorageModule } from '@ionic/storage-angular'; // Para el nombre y modo oscuro
 
 import { AppComponent } from './app/app.component';
 import { environment } from './environments/environment';
@@ -15,8 +18,11 @@ if (environment.production) {
 bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
-    Storage,
-    provideRouter(routes),             
-    importProvidersFrom(IonicModule.forRoot()),
+    provideHttpClient(), // Configurado correctamente
+    provideRouter(routes), 
+    importProvidersFrom(
+      IonicModule.forRoot(),
+      IonicStorageModule.forRoot() // Configuración correcta de Storage
+    ),
   ],
 });

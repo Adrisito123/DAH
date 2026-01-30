@@ -1,88 +1,90 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>Inicio</ion-title>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Hola, {{ nombre }}
+    </ion-title>
+    <ion-buttons slot="end">
+      <ion-button routerLink="/settings">
+        <ion-icon slot="icon-only" name="settings-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+
+  <ion-toolbar color="primary">
+    <ion-searchbar 
+      placeholder="Buscar noticias..." 
+      (ionInput)="buscar($event)" 
+      [debounce]="500"
+      animated="true">
+    </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <div class="container mx-auto max-w-screen-xl">
+<ion-content class="ion-padding">
 
-    <app-header 
-      titulo="Noticias de Última sobre futbol" 
-      subtitulo="La actualidad de lo mejor del deporte">
-    </app-header>
+  <ion-item lines="none" class="ion-margin-bottom">
+    <ion-label>Ordenar por:</ion-label>
+    <ion-select interface="popover" value="id_desc" (ionChange)="cambiarOrden($event)">
+      <ion-select-option value="id_desc">Novedades</ion-select-option>
+      <ion-select-option value="titulo_asc">Título (A-Z)</ion-select-option>
+      <ion-select-option value="autor_asc">Autor</ion-select-option>
+    </ion-select>
+  </ion-item>
 
-    <ion-fab vertical="top" horizontal="end" slot="fixed">
-      <ion-fab-button (click)="toggleFormulario()" class="fab-transparente">
-        <span class="fab-plus">{{ mostrarFormulario ? '×' : '+' }}</span>
-      </ion-fab-button>
-    </ion-fab>
-
-    <div *ngIf="mostrarFormulario" class="formulario-desplegable">
-      <ion-list>
-        <ion-item>
-          <ion-input label="Título" label-placement="floating" placeholder="Título de la noticia"
-            [(ngModel)]="nuevaNoticia.titulo"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-textarea label="Resumen" label-placement="floating" placeholder="Resumen breve"
-            [(ngModel)]="nuevaNoticia.resumen"></ion-textarea>
-        </ion-item>
-
-        <ion-item>
-          <ion-input label="Autor" label-placement="floating" placeholder="Autor"
-            [(ngModel)]="nuevaNoticia.autor"></ion-input>
-        </ion-item>
-
-        <ion-item>
-          <ion-input label="URL de Imagen" label-placement="floating" placeholder="https://..."
-            [(ngModel)]="nuevaNoticia.imagenUrl"></ion-input>
-        </ion-item>
-      </ion-list>
-
-      <ion-button expand="block" (click)="agregarNoticia()">
-        Añadir Noticia
-      </ion-button>
-    </div>
-
-    <ion-grid *ngIf="cargando" class="px-4">
-      <ion-row>
-        <ion-col size="12" size-sm="6" size-md="4" size-lg="3"
-          *ngFor="let item of skeletons" class="ion-padding-bottom">
-          <ion-card>
-            <ion-skeleton-text animated style="width: 100%; height: 200px;"></ion-skeleton-text>
-            <ion-card-header>
-              <ion-card-subtitle><ion-skeleton-text animated style="width: 60px;"></ion-skeleton-text></ion-card-subtitle>
-              <ion-card-title><ion-skeleton-text animated style="width: 90%;"></ion-skeleton-text></ion-card-title>
-            </ion-card-header>
-            <ion-card-content>
-              <ion-skeleton-text animated style="width: 100%; height: 40px;"></ion-skeleton-text>
-            </ion-card-content>
-          </ion-card>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-    <h2 class="text-2xl font-bold text-gray-800 mb-4 px-4" *ngIf="!cargando && noticias.length > 0">Últimas Novedades</h2>
-    <ion-grid *ngIf="!cargando && noticias.length > 0" class="px-4">
-      <ion-row class="ion-align-items-start">
-        <ion-col size="12" size-sm="6" size-md="4" size-lg="3"
-          *ngFor="let item of noticias; trackBy: trackById" class="ion-padding-bottom">
-          
-          <app-task-item 
-            [noticia]="item"
-            [cargando]="cargando"
-            (mostrarDetalles)="mostrarDetallesNoticia($event)"
-            (eliminarNoticia)="eliminarNoticia($event)"> 
-          </app-task-item>
-        </ion-col>
-      </ion-row>
-    </ion-grid>
-
-    <div *ngIf="!cargando && noticias.length === 0" class="text-center ion-padding-top">
-        <h1 class="text-2xl font-bold text-gray-800">No hay noticias</h1>
-        <p class="text-gray-600">Añade una noticia para empezar.</p>
-    </div>
-
+  <div *ngIf="mostrarFormulario" class="ion-margin-bottom" style="border: 1px solid #ccc; padding: 10px; border-radius: 8px;">
+    <ion-item>
+      <ion-label position="stacked">Título</ion-label>
+      <ion-input [(ngModel)]="nuevaNoticia.titulo" placeholder="Ej: Goleada del Málaga"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Resumen</ion-label>
+      <ion-textarea [(ngModel)]="nuevaNoticia.resumen" placeholder="Breve descripción..."></ion-textarea>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Autor</ion-label>
+      <ion-input [(ngModel)]="nuevaNoticia.autor" placeholder="Tu nombre"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">URL Imagen</ion-label>
+      <ion-input [(ngModel)]="nuevaNoticia.imagenUrl" placeholder="https://..."></ion-input>
+    </ion-item>
+    <ion-button expand="block" (click)="agregarNoticia()" class="ion-margin-top">
+      Publicar Noticia
+    </ion-button>
+    <ion-button expand="block" fill="clear" color="medium" (click)="toggleFormulario()">
+      Cancelar
+    </ion-button>
   </div>
+
+    <ion-grid>
+    <ion-row>
+      <ion-col size="12" size-md="6" size-lg="4" *ngFor="let item of noticias; trackBy: trackById">
+        <app-task-noticia 
+          [noticia]="item" 
+          (eliminar)="eliminarNoticia($event)">
+        </app-task-noticia>
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+
+  <ng-template #skeleton>
+    <ion-list>
+      <ion-item *ngFor="let i of [1,2,3,4]">
+        <ion-thumbnail slot="start">
+          <ion-skeleton-text animated></ion-skeleton-text>
+        </ion-thumbnail>
+        <ion-label>
+          <ion-skeleton-text animated style="width: 80%"></ion-skeleton-text>
+          <ion-skeleton-text animated style="width: 60%"></ion-skeleton-text>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+  </ng-template>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="toggleFormulario()">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
 </ion-content>

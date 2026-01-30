@@ -1,0 +1,78 @@
+// Fondo gris claro para que la caja blanca resalte
+.gray-bg {
+  --background: #f4f5f8;
+}
+
+.container {
+  display: flex;
+  justify-content: center;
+}
+
+.main-card {
+  width: 100%;
+  max-width: 600px; // Evita que la caja sea gigante en tablets/PC
+  border-radius: 16px;
+  margin: 0;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  background: white;
+}
+
+.imagen-wrapper {
+  width: 100%;
+  padding: 16px; // Espacio alrededor de la foto para que no toque los bordes
+  display: flex;
+  justify-content: center;
+  background: #f9f9f9;
+
+  img {
+    width: auto;
+    max-width: 100%;
+    max-height: 250px; // Hacemos la foto más chica
+    border-radius: 12px;
+    object-fit: contain; // ESTO EVITA QUE SE EXTIENDA O SE ESTIRE
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+}
+
+.autor-item {
+  --padding-start: 0;
+  --background: transparent;
+  color: black;
+  margin-bottom: 10px;
+
+  h3 {
+    font-weight: bold;
+    font-size: 1rem;
+  }
+}
+
+.titulo-noticia {
+  font-size: 1.6rem !important;
+  font-weight: 800;
+  line-height: 1.2;
+  color: #222;
+  margin-top: 10px;
+}
+
+.resumen-box {
+  background: #f0f7ff;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 4px solid var(--ion-color-primary);
+  color: #444;
+  font-style: italic;
+  font-size: 1.05rem;
+  margin-bottom: 20px;
+}
+
+.cuerpo-texto {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  color: #333;
+}
+
+.loader {
+  display: flex;
+  justify-content: center;
+  padding-top: 50px;
+}

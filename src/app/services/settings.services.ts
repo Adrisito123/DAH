@@ -1,4 +1,3 @@
-// src/app/services/settings.service.ts
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 
@@ -6,33 +5,43 @@ import { Storage } from '@ionic/storage-angular';
   providedIn: 'root'
 })
 export class SettingsService {
-  private storageReady = false;
+  private _storage: Storage | null = null;
+  private darkMode = false;
 
   constructor(private storage: Storage) {
     this.init();
   }
 
   async init() {
-    // Crear instancia de Storage
-    await this.storage.create();
-    this.storageReady = true;
-
-    // Aplicar modo oscuro al iniciar
-    const darkMode = await this.storage.get('darkMode');
-    if (darkMode !== null) {
-      document.body.classList.toggle('dark', darkMode);
-    }
+    const storage = await this.storage.create();
+    this._storage = storage;
+    await this.loadSettings();
   }
 
-  async setDarkMode(isDark: boolean) {
-    if (!this.storageReady) return;
-    document.body.classList.toggle('dark', isDark);
-    await this.storage.set('darkMode', isDark);
+  async loadSettings() {
+    if (!this._storage) return;
+    const savedDarkMode = await this._storage.get('darkMode');
+    this.darkMode = savedDarkMode || false;
+    this.applyDarkMode(this.darkMode);
   }
 
-  async loadDarkMode(): Promise<boolean | null> {
-    if (!this.storageReady) return null;
-    const dark = await this.storage.get('darkMode');
-    return dark;
+  applyDarkMode(isDark: boolean) {
+    this.darkMode = isDark;
+    document.documentElement.classList.toggle('ion-palette-dark', isDark);
+    this._storage?.set('darkMode', isDark);
+  }
+
+  isDarkMode() {
+    return this.darkMode;
+  }
+
+  // MEJORA 1: Gestión del nombre
+  async saveNombre(nombre: string) {
+    await this._storage?.set('userName', nombre);
+  }
+
+  async getNombre(): Promise<string> {
+    if (!this._storage) await this.init();
+    return await this._storage?.get('userName') || '';
   }
 }

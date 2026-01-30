@@ -1,13 +1,51 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>detalle-noticia</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/home" text="Volver"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Detalle</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="eliminarNoticia()">
+        <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
-    <ion-toolbar>
-      <ion-title size="large">detalle-noticia</ion-title>
-    </ion-toolbar>
-  </ion-header>
+<ion-content class="ion-padding gray-bg">
+  <div *ngIf="noticia; else cargando" class="container">
+    
+    <ion-card class="main-card">
+      <div class="imagen-wrapper">
+        <img [src]="noticia.imagenUrl" [alt]="noticia.titulo" />
+      </div>
+
+      <ion-card-header>
+        <ion-item lines="none" class="autor-item">
+          <ion-avatar slot="start">
+            <img src="https://ionicframework.com/docs/img/demos/avatar.svg" />
+          </ion-avatar>
+          <ion-label>
+            <h3>{{ noticia.autor }}</h3>
+            <p>{{ noticia.fechaPublicacion | date:'mediumDate' }}</p>
+          </ion-label>
+        </ion-item>
+        <ion-card-title class="titulo-noticia">{{ noticia.titulo }}</ion-card-title>
+      </ion-card-header>
+
+      <ion-card-content>
+        <div class="resumen-box">
+          {{ noticia.resumen }}
+        </div>
+        
+      </ion-card-content>
+    </ion-card>
+
+  </div>
+
+  <ng-template #cargando>
+    <div class="loader">
+      <ion-spinner name="crescent"></ion-spinner>
+    </div>
+  </ng-template>
 </ion-content>

@@ -1,92 +1,157 @@
-// src/app/pages/home/home.page.ts
-import { Component } from '@angular/core';
-import { IonicModule, ToastController, AlertController } from '@ionic/angular';
+import { Component, OnInit } from '@angular/core';
+import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
-import { TaskService } from 'src/app/services/task.service';
-import { Noticia } from 'src/app/interfaces/noticia';
-import { TaskItemComponent } from 'src/app/components/task-item/task-noticia.component';
-import { AppHeaderComponent } from 'src/app/components/app-header/app-header.component';
+import { Router, RouterModule } from '@angular/router';
+import { addIcons } from 'ionicons';
+import { settingsOutline, add, searchOutline, filterOutline } from 'ionicons/icons';
+
+import { TaskService } from '../services/task.service';
+import { SettingsService } from '../services/settings.services';
+import { Noticia } from '../interfaces/noticia';
+import { TaskItemComponent } from '../components/task-item/task-noticia.component';
 
 @Component({
-  selector: 'app-home',
+  selector: 'app-home', // <--- ANTES DECÍA 'app-task-noticia', ESO DABA EL ERROR
+  templateUrl: './home.page.html',
   standalone: true,
-  imports: [IonicModule, FormsModule, TaskItemComponent, AppHeaderComponent],
-  template: `
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Inicio</ion-title>
-  </ion-toolbar>
-</ion-header>
-
-<ion-content class="ion-padding">
-  <app-header titulo="Noticias de fútbol" subtitulo="Actualidad deportiva"></app-header>
-
-  <ion-fab vertical="top" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="toggleFormulario()">{{ mostrarFormulario ? '×' : '+' }}</ion-fab-button>
-  </ion-fab>
-
-  <div *ngIf="mostrarFormulario">
-    <ion-list>
-      <ion-item>
-        <ion-input placeholder="Título" [(ngModel)]="nuevaNoticia.titulo"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-textarea placeholder="Resumen" [(ngModel)]="nuevaNoticia.resumen"></ion-textarea>
-      </ion-item>
-      <ion-item>
-        <ion-input placeholder="Autor" [(ngModel)]="nuevaNoticia.autor"></ion-input>
-      </ion-item>
-      <ion-item>
-        <ion-input placeholder="URL de Imagen" [(ngModel)]="nuevaNoticia.imagenUrl"></ion-input>
-      </ion-item>
-    </ion-list>
-    <ion-button expand="block" (click)="agregarNoticia()">Añadir Noticia</ion-button>
-  </div>
-
-  <ion-grid>
-    <ion-row>
-      <ion-col size="12" size-md="4" *ngFor="let item of noticias; trackBy: trackById">
-        <app-task-item 
-          [noticia]="item" 
-          (mostrarDetalles)="verDetalle($event)"
-        ></app-task-item>
-      </ion-col>
-    </ion-row>
-  </ion-grid>
-
-  <div *ngIf="noticias.length === 0">No hay noticias</div>
-</ion-content>
-  `
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, TaskItemComponent]
 })
-export class HomePage {
+export class HomePage implements OnInit {
   noticias: Noticia[] = [];
+  nombre: string = 'Usuario';
   mostrarFormulario = false;
-  nuevaNoticia: Partial<Noticia> = {};
+  cargando = true;
 
-  constructor(private taskService: TaskService, private toastController: ToastController, private router: Router) {}
+  nuevaNoticia: Partial<Noticia> = {
+    titulo: '',
+    resumen: '',
+    autor: '',
+    imagenUrl: ''
+  };
 
-  ngOnInit() {
-    this.noticias = this.taskService.getNoticias();
+  constructor(
+    private taskService: TaskService,
+    private settingsService: SettingsService,
+    private router: Router,
+    private loadingController: LoadingController,
+    private toastController: ToastController
+  ) {
+    addIcons({ settingsOutline, add, searchOutline, filterOutline });
+  }
+
+  ngOnInit() {}
+
+  async ionViewWillEnter() {
+    this.cargarNombre();
+    await this.cargarNoticias();
+  }
+
+  async cargarNombre() {
+    const nombreGuardado = await this.settingsService.getNombre();
+    this.nombre = nombreGuardado || 'Usuario';
+  }
+
+  async cargarNoticias() {
+    this.cargando = true;
+    this.taskService.getNoticias().subscribe({
+      next: (data) => {
+        this.noticias = data;
+        this.cargando = false;
+      },
+      error: (err) => {
+        this.cargando = false;
+        console.error('Error:', err);
+      }
+    });
+  }
+
+  buscar(event: any) {
+    const texto = event.target.value;
+    if (texto && texto.trim() !== '') {
+      this.taskService.buscarNoticias(texto).subscribe(data => this.noticias = data);
+    } else {
+      this.cargarNoticias();
+    }
+  }
+
+  cambiarOrden(event: any) {
+    const criterio = event.detail.value;
+    
+    // Creamos una copia nueva del array para que Angular detecte el cambio
+    const noticiasOrdenadas = [...this.noticias];
+
+    switch (criterio) {
+      case 'id_desc':
+        // De más nuevas a más viejas (asumiendo que el ID sube)
+        noticiasOrdenadas.sort((a, b) => Number(b.id) - Number(a.id));
+        break;
+        
+      case 'titulo_asc':
+        // Orden alfabético A-Z
+        noticiasOrdenadas.sort((a, b) => a.titulo.localeCompare(b.titulo));
+        break;
+
+      case 'autor_asc':
+        // Por nombre de autor
+        noticiasOrdenadas.sort((a, b) => a.autor.localeCompare(b.autor));
+        break;
+    }
+
+    // Reasignamos el array ordenado
+    this.noticias = noticiasOrdenadas;
   }
 
   toggleFormulario() {
     this.mostrarFormulario = !this.mostrarFormulario;
   }
 
-  agregarNoticia() {
-    if (!this.nuevaNoticia.titulo?.trim() || !this.nuevaNoticia.resumen?.trim()) return;
-    this.taskService.agregarNoticia(this.nuevaNoticia as Noticia);
-    this.nuevaNoticia = {};
-    this.noticias = this.taskService.getNoticias();
-    this.mostrarFormulario = false;
+  async agregarNoticia() {
+    if (!this.nuevaNoticia.titulo?.trim()) {
+      this.mostrarToast('El título es obligatorio', 'warning');
+      return;
+    }
+
+    const noticiaAGuardar: any = {
+      titulo: this.nuevaNoticia.titulo,
+      resumen: this.nuevaNoticia.resumen || '',
+      autor: this.nuevaNoticia.autor || 'Anónimo',
+      imagenUrl: this.nuevaNoticia.imagenUrl || 'https://via.placeholder.com/150',
+      fechaPublicacion: new Date().toISOString()
+    };
+
+    this.taskService.agregarNoticia(noticiaAGuardar).subscribe({
+      next: () => {
+        this.mostrarToast('Noticia publicada con éxito', 'success');
+        this.nuevaNoticia = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
+        this.mostrarFormulario = false;
+        this.cargarNoticias();
+      },
+      error: () => this.mostrarToast('Error al guardar', 'danger')
+    });
+  }
+
+  eliminarNoticia(noticia: Noticia) {
+    if (!noticia.id) return;
+    this.taskService.eliminarNoticia(noticia.id.toString()).subscribe({
+      next: () => {
+        this.mostrarToast('Noticia eliminada', 'success');
+        this.cargarNoticias(); 
+      }
+    });
+  }
+
+  async mostrarToast(mensaje: string, color: string) {
+    const toast = await this.toastController.create({
+      message: mensaje,
+      duration: 2000,
+      color: color,
+      position: 'bottom'
+    });
+    await toast.present();
   }
 
   trackById(index: number, item: Noticia) {
     return item.id;
-  }
-
-  verDetalle(noticia: Noticia) {
-    this.router.navigate(['/detalle', noticia.id]);
   }
 }
