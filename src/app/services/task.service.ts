@@ -46,8 +46,7 @@ getNoticiaById(id: string | number): Observable<Noticia> {
   return this.http.delete(`${this.url}/${id}`);
 }
 
-  // OPCIONAL: Para editar (Requisito de "Editar")
-  actualizarNoticia(id: string, noticia: Partial<Noticia>): Observable<Noticia> {
-    return this.http.patch<Noticia>(`${this.url}/${id}`, noticia);
+  actualizarNoticia(noticia: Noticia): Observable<Noticia> {
+    return this.http.put<Noticia>(`${this.url}/${noticia.id}`, noticia);
   }
 }

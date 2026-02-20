@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { close, settingsOutline, add, searchOutline, filterOutline, trashOutline } from 'ionicons/icons';
+import { close, settingsOutline, add, searchOutline, filterOutline, trashOutline, createOutline } from 'ionicons/icons';
 
 import { TaskService } from '../services/task.service';
 import { SettingsService } from '../services/settings.services';
@@ -33,7 +33,7 @@ export class HomePage implements OnInit {
     private settingsService: SettingsService,
     private toastController: ToastController
   ) {
-    addIcons({ close, settingsOutline, add, searchOutline, filterOutline, trashOutline });
+    addIcons({ close, settingsOutline, add, searchOutline, filterOutline, trashOutline,createOutline });
   }
 
   ngOnInit() {
@@ -46,6 +46,7 @@ export class HomePage implements OnInit {
     this.nombre = n || 'Usuario';
   }
 
+  public esqueletoCajas: number[] = [1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12];
   cargarNoticias() {
     this.cargando = true;
     this.taskService.getNoticias(this.textoBusqueda, this.campoOrden, this.sentidoOrden).subscribe({
@@ -125,6 +126,40 @@ export class HomePage implements OnInit {
   async mostrarToast(m: string) {
     const t = await this.toastController.create({ message: m, duration: 2000 });
     await t.present();
+  }
+  noticiaEditandoId: string | number | null = null;
+
+  // Función para abrir el formulario con los datos de la noticia
+  editarNoticia(noticia: Noticia) {
+    this.noticiaEditandoId = noticia.id!;
+    this.nuevaNoticia = { ...noticia }; // Copiamos los datos al formulario
+    this.mostrarFormulario = true;
+    // Hacemos scroll hacia arriba para ver el formulario
+    window.scrollTo(0, 0);
+  }
+
+  // Modificamos la función de guardar para que sirva para ambos casos
+  guardarNoticia() {
+    if (!this.nuevaNoticia.titulo || !this.nuevaNoticia.resumen) return;
+
+    if (this.noticiaEditandoId) {
+      // CASO EDITAR
+      const noticiaEditada = { ...this.nuevaNoticia, id: this.noticiaEditandoId } as Noticia;
+      this.taskService.actualizarNoticia(noticiaEditada).subscribe(() => {
+        this.mostrarToast('Noticia actualizada');
+        this.finalizarFormulario();
+      });
+    } else {
+      // CASO AGREGAR (Tu lógica anterior)
+      this.agregarNoticia(); 
+    }
+  }
+
+  finalizarFormulario() {
+    this.mostrarFormulario = false;
+    this.noticiaEditandoId = null;
+    this.nuevaNoticia = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
+    this.cargarNoticias();
   }
 
   trackById(i: number, item: Noticia) { return item.id; }

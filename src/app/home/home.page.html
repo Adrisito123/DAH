@@ -26,7 +26,7 @@
 
   <ion-card *ngIf="mostrarFormulario">
     <ion-card-header>
-      <ion-card-title>Nueva Noticia</ion-card-title>
+      <ion-card-title>{{ noticiaEditandoId ? 'Editar Noticia' : 'Nueva Noticia' }}</ion-card-title>
     </ion-card-header>
 
     <ion-card-content>
@@ -46,42 +46,51 @@
         <ion-input [(ngModel)]="nuevaNoticia.imagenUrl" placeholder="URL Imagen"></ion-input>
       </ion-item>
 
-      <ion-button expand="block" (click)="agregarNoticia()">
-        Publicar
+      <ion-button expand="block" (click)="guardarNoticia()">
+        {{ noticiaEditandoId ? 'Guardar Cambios' : 'Publicar' }}
+      </ion-button>
+
+      <ion-button expand="block" fill="clear" color="medium" (click)="finalizarFormulario()">
+        Cancelar
       </ion-button>
     </ion-card-content>
   </ion-card>
 
   <ion-grid>
-    <ion-row>
-      
-      <ng-container *ngIf="cargando">
-        <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let item of [1,2,3,4,5,6,7,8]">
-          <ion-card style="height: 320px; margin: 0; background: #1e1e1e;">
-            <ion-skeleton-text animated style="width: 100%; height: 120px; margin: 0;"></ion-skeleton-text>
-            <div style="padding: 10px;">
-              <ion-skeleton-text animated style="width: 40%; height: 12px; margin-bottom: 10px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 90%; height: 18px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 100%; height: 10px; margin-top: 15px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 80%; height: 10px;"></ion-skeleton-text>
-              <ion-skeleton-text animated style="width: 100%; height: 32px; margin-top: 20px; border-radius: 6px;"></ion-skeleton-text>
+  <ion-row>
+    
+    <ng-container *ngIf="cargando">
+      <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let item of esqueletoCajas">
+        <ion-card class="noticia-card" style="margin: 4px; height: 350px;">
+          <ion-skeleton-text animated style="width: 100%; height: 150px; margin: 0;"></ion-skeleton-text>
+          
+          <div style="padding: 10px;">
+            <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 90%; height: 18px; margin-top: 10px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 100%; height: 10px; margin-top: 15px;"></ion-skeleton-text>
+            <ion-skeleton-text animated style="width: 70%; height: 10px;"></ion-skeleton-text>
+            
+            <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+               <ion-skeleton-text animated style="width: 60%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
+               <ion-skeleton-text animated style="width: 20%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
             </div>
-          </ion-card>
-        </ion-col>
-      </ng-container>
+          </div>
+        </ion-card>
+      </ion-col>
+    </ng-container>
 
-      <ng-container *ngIf="!cargando">
-        <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let n of noticias; trackBy: trackById">
-          <app-task-item [noticia]="n" (eliminar)="eliminarNoticia(n)"></app-task-item>
-        </ion-col>
+    <ng-container *ngIf="!cargando">
+      <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let n of noticias; trackBy: trackById">
+        <app-task-item 
+          [noticia]="n" 
+          (eliminar)="eliminarNoticia(n)" 
+          (editar)="editarNoticia(n)">
+        </app-task-item>
+      </ion-col>
+    </ng-container>
 
-        <ion-col size="12" *ngIf="noticias.length === 0" class="ion-text-center">
-          <p style="color: #aaa; margin-top: 50px;">No se encontraron noticias.</p>
-        </ion-col>
-      </ng-container>
-
-    </ion-row>
-  </ion-grid>
+  </ion-row>
+</ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="toggleFormulario()">

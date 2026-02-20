@@ -13,9 +13,14 @@ import { RouterModule } from '@angular/router';
 export class TaskItemComponent {
   @Input() noticia!: Noticia;
   @Output() eliminar = new EventEmitter<Noticia>();
+  @Output() editar = new EventEmitter<void>();
 
   onEliminar() {
     console.log('Hijo: Click en eliminar de la noticia:', this.noticia.id);
     this.eliminar.emit(this.noticia); // Emitimos el objeto noticia completo
+  }
+
+  onEditar() {
+    this.editar.emit();
   }
 }

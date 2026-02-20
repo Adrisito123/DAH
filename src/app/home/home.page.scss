@@ -6,13 +6,13 @@ ion-row {
 ion-col {
   display: flex; 
   align-items: stretch;
+  padding: 8px; /* Controla el espacio entre noticias aquí */
 }
 
-/* IMPORTANTE: El selector del componente hijo */
 app-task-item {
   width: 100%;
   display: flex;
-  flex: 1; /* Esto obliga al componente a estirarse */
+  flex: 1; 
 }
 ion-skeleton-text {
   --background: rgba(255, 255, 255, 0.05);
