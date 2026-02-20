@@ -1,9 +1,8 @@
-// src/app/interfaces/noticia.ts
 export interface Noticia {
-  id: String;
+  id?: number; 
   titulo: string;
   resumen: string;
   autor: string;
-  fechaPublicacion: Date;
+  fechaPublicacion: string;
   imagenUrl: string;
 }

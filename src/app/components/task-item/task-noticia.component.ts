@@ -1,35 +1,21 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
-import { IonicModule } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router'; 
-import { addIcons } from 'ionicons';
-import { trash } from 'ionicons/icons';
+import { IonicModule } from '@ionic/angular';
 import { Noticia } from '../../interfaces/noticia';
+import { RouterModule } from '@angular/router';
 
 @Component({
-  selector: 'app-task-noticia',
-  // Si te sigue dando error aquí, asegúrate de que el archivo físico se llama EXACTAMENTE así
-  templateUrl: './task-noticia.component.html', 
-  styleUrls: ['./task-noticia.component.scss'],
+  selector: 'app-task-item',
+  templateUrl: './task-noticia.component.html',
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [CommonModule, IonicModule, RouterModule]
 })
 export class TaskItemComponent {
   @Input() noticia!: Noticia;
   @Output() eliminar = new EventEmitter<Noticia>();
 
-  constructor(private router: Router) {
-    addIcons({ trash });
-  }
-
-  onMostrarDetalles() {
-    // Coincidiendo con tu path: 'detalle/:id'
-    if (this.noticia && this.noticia.id) {
-      this.router.navigate(['/detalle', this.noticia.id]);
-    }
-  }
-
-  onEliminarNoticia() {
-    this.eliminar.emit(this.noticia);
+  onEliminar() {
+    console.log('Hijo: Click en eliminar de la noticia:', this.noticia.id);
+    this.eliminar.emit(this.noticia); // Emitimos el objeto noticia completo
   }
 }

@@ -1,100 +1,68 @@
-/* -----------------------------------------------------------------
-   ESTILOS DE LAS TARJETAS (ALTURA UNIFORME) 🏆
------------------------------------------------------------------ */
-ion-card {
+:host {
+  display: flex;
+  width: 100%;
+  height: 100%; /* Muy importante */
+}
+
+.noticia-card {
   display: flex;
   flex-direction: column;
-  height: 450px; /* Altura fija */
+  width: 100%;
+  
+  /* ESTO ES LO QUE BUSCAS: Altura fija absoluta */
+  height: 380px; 
+  min-height: 380px;
+  max-height: 380px;
+
+  margin: 0;
+  background: #1e1e1e;
+  border-radius: 12px;
   overflow: hidden;
-  background: linear-gradient(145deg, #ffffff, #f0f0f0);
-  border-radius: 0.75rem;
-  border: 2px solid #0f172a;
-  transition: transform 0.3s, box-shadow 0.3s;
+}
 
-  &:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 10px 20px rgba(0,0,0,0.25);
-  }
-
-  ion-card-header {
-    flex-shrink: 0; 
-    padding-bottom: 0.75rem;
-  }
-
-  ion-card-content {
-    flex-grow: 1; 
-    display: flex;
-    flex-direction: column;
-    padding-top: 0 !important;
-  }
-
-  .imagen-container {
-    height: 180px; 
-    overflow: hidden;
-    border-radius: 0.5rem;
-    margin-bottom: 0.75rem;
-    position: relative;
-    flex-shrink: 0; 
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    background: #f0f0f0; /* Fondo gris para bordes cuando la imagen no ocupa todo */
-  }
-
-  .noticia-imagen {
+.imagen-wrapper {
+  height: 140px; /* Altura de imagen fija */
+  flex-shrink: 0;
+  img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* <-- Mantiene la imagen completa dentro del contenedor */
-    object-position: center;
-  }
-
-  p.line-clamp-3 {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;  
-    overflow: hidden;
-    color: #374151;
-    flex-grow: 1; 
-    margin-bottom: 0.5rem; 
-    line-height: 1.4;
-  }
-
-  .card-footer {
-    margin-top: auto; /* Empuja el footer al final */
-    flex-shrink: 0; 
+    object-fit: cover;
   }
 }
 
-/* Badge destacada */
-.badge-destacada {
-  position: absolute; top: 0; right: 0; 
-  background: #ef4444; color: #fff; 
-  font-weight: bold; 
-  padding: 0.25rem 0.75rem; 
-  border-bottom-left-radius: 0.5rem; 
-  font-size: 0.65rem; 
-  text-transform: uppercase; 
-  box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+.contenido-noticia {
+  display: flex;
+  flex-direction: column;
+  flex: 1; /* Ocupa todo el espacio que sobra de la imagen */
+  padding: 12px;
 }
 
-/* Títulos */
-ion-card-title { 
-  font-family: 'Roboto', sans-serif; 
-  font-weight: 800; 
-  font-size: 1.1rem; 
-  color: #1f2937; 
-}
-ion-card-subtitle { 
-  font-family: 'Roboto', sans-serif; 
-  font-weight: 700; 
-  font-size: 0.65rem; 
-  letter-spacing: 0.05em; 
-  color: #2563eb; 
+/* TÍTULO: Bloque de altura fija */
+.titulo-limitado {
+  height: 2.8rem; /* Altura fija para 2 líneas siempre */
+  margin-bottom: 8px;
+  font-size: 1rem;
+  line-height: 1.4rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: white;
 }
 
-/* Botones pequeños */
-ion-button { 
-  --padding-start: 0.3rem; 
-  --padding-end: 0.3rem; 
-  --padding-top: 0.2rem; 
-  --padding-bottom: 0.2rem;
+/* RESUMEN: Bloque de altura fija */
+.resumen-limitado {
+  height: 4.5rem; /* Altura fija para 4 líneas siempre */
+  font-size: 0.85rem;
+  line-height: 1.1rem;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #ccc;
+}
+
+.cuerpo-inferior {
+  margin-top: auto; /* Empuja los botones al borde inferior */
+  padding-top: 10px;
 }

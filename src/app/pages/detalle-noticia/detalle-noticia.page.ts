@@ -1,18 +1,19 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { IonicModule, ToastController, AlertController } from '@ionic/angular'; // Añadimos AlertController
+import { FormsModule } from '@angular/forms';
+import { IonicModule } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TaskService } from '../../services/task.service';
 import { Noticia } from '../../interfaces/noticia';
 import { addIcons } from 'ionicons';
-import { trashOutline, personCircleOutline } from 'ionicons/icons';
+import { trashOutline } from 'ionicons/icons';
 
 @Component({
   selector: 'app-detalle-noticia',
   templateUrl: './detalle-noticia.page.html',
   styleUrls: ['./detalle-noticia.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule]
+  imports: [IonicModule, CommonModule, FormsModule]
 })
 export class DetalleNoticiaPage implements OnInit {
   noticia?: Noticia;
@@ -20,58 +21,30 @@ export class DetalleNoticiaPage implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private taskService: TaskService,
-    private toastController: ToastController,
-    private alertController: AlertController // Para confirmar antes de borrar
+    private taskService: TaskService
   ) {
-    addIcons({ trashOutline, personCircleOutline });
+    addIcons({ trashOutline });
   }
 
   ngOnInit() {
     const id = this.route.snapshot.paramMap.get('id');
     if (id) {
+      // JSON Server acepta buscar por ID como string en la URL aunque sea número
       this.taskService.getNoticiaById(id).subscribe({
         next: (data) => this.noticia = data,
-        error: () => this.router.navigate(['/home']) // Si no existe, volvemos
+        error: () => this.router.navigate(['/home'])
       });
     }
   }
 
-  // MÉTODO PARA ELIMINAR
-  async eliminarNoticia() {
-    if (!this.noticia?.id) return;
-
-    // Opcional: Confirmación para evitar borrados accidentales
-    const alert = await this.alertController.create({
-      header: '¿Borrar noticia?',
-      message: 'Esta acción no se puede deshacer.',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Eliminar',
-          role: 'destructive',
-          handler: () => {
-            this.taskService.eliminarNoticia(this.noticia!.id.toString()).subscribe({
-              next: () => {
-                this.mostrarToast('Noticia eliminada correctamente');
-                this.router.navigate(['/home']); // Redirigir al Home
-              },
-              error: () => this.mostrarToast('Error al eliminar')
-            });
-          }
+  eliminarNoticia() {
+    // IMPORTANTE: Validación para evitar el error "Object is possibly undefined"
+    if (this.noticia && this.noticia.id !== undefined) {
+      this.taskService.eliminarNoticia(this.noticia.id).subscribe({
+        next: () => {
+          this.router.navigate(['/home']);
         }
-      ]
-    });
-
-    await alert.present();
-  }
-
-  async mostrarToast(msg: string) {
-    const toast = await this.toastController.create({
-      message: msg,
-      duration: 2000,
-      position: 'bottom'
-    });
-    await toast.present();
+      });
+    }
   }
 }

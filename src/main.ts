@@ -19,7 +19,7 @@ bootstrapApplication(AppComponent, {
   providers: [
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
     provideHttpClient(), // Configurado correctamente
-    provideRouter(routes), 
+    provideRouter(routes),
     importProvidersFrom(
       IonicModule.forRoot(),
       IonicStorageModule.forRoot() // Configuración correcta de Storage

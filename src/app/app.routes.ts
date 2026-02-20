@@ -14,6 +14,10 @@ export const routes: Route[] = [
     path: 'settings',
     loadComponent: () => import('./services/settings.page').then(m => m.SettingsPage),
   },
+{
+  path: 'detalle-noticia/:id', // Debe ser exactamente este nombre
+  loadComponent: () => import('./pages/detalle-noticia/detalle-noticia.page').then( m => m.DetalleNoticiaPage)
+},
 ];
 
 export const appRoutes = provideRouter(routes);

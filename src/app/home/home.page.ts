@@ -1,10 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { IonicModule, LoadingController, ToastController } from '@ionic/angular';
+import { IonicModule, ToastController } from '@ionic/angular';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { addIcons } from 'ionicons';
-import { settingsOutline, add, searchOutline, filterOutline } from 'ionicons/icons';
+import { close, settingsOutline, add, searchOutline, filterOutline, trashOutline } from 'ionicons/icons';
 
 import { TaskService } from '../services/task.service';
 import { SettingsService } from '../services/settings.services';
@@ -12,146 +12,120 @@ import { Noticia } from '../interfaces/noticia';
 import { TaskItemComponent } from '../components/task-item/task-noticia.component';
 
 @Component({
-  selector: 'app-home', // <--- ANTES DECÍA 'app-task-noticia', ESO DABA EL ERROR
+  selector: 'app-home',
   templateUrl: './home.page.html',
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule, RouterModule, TaskItemComponent]
 })
 export class HomePage implements OnInit {
   noticias: Noticia[] = [];
+  textoBusqueda: string = '';
+  campoOrden: string = 'id';
+  sentidoOrden: string = 'desc';
   nombre: string = 'Usuario';
   mostrarFormulario = false;
   cargando = true;
 
-  nuevaNoticia: Partial<Noticia> = {
-    titulo: '',
-    resumen: '',
-    autor: '',
-    imagenUrl: ''
-  };
+  nuevaNoticia: Partial<Noticia> = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
 
   constructor(
     private taskService: TaskService,
     private settingsService: SettingsService,
-    private router: Router,
-    private loadingController: LoadingController,
     private toastController: ToastController
   ) {
-    addIcons({ settingsOutline, add, searchOutline, filterOutline });
+    addIcons({ close, settingsOutline, add, searchOutline, filterOutline, trashOutline });
   }
 
-  ngOnInit() {}
-
-  async ionViewWillEnter() {
+  ngOnInit() {
     this.cargarNombre();
-    await this.cargarNoticias();
+    this.cargarNoticias();
   }
 
   async cargarNombre() {
-    const nombreGuardado = await this.settingsService.getNombre();
-    this.nombre = nombreGuardado || 'Usuario';
+    const n = await this.settingsService.getNombre();
+    this.nombre = n || 'Usuario';
   }
 
-  async cargarNoticias() {
+  cargarNoticias() {
     this.cargando = true;
-    this.taskService.getNoticias().subscribe({
+    this.taskService.getNoticias(this.textoBusqueda, this.campoOrden, this.sentidoOrden).subscribe({
       next: (data) => {
-        this.noticias = data;
-        this.cargando = false;
+        this.noticias = [...data];
+        setTimeout(() => this.cargando = false, 500);
       },
-      error: (err) => {
-        this.cargando = false;
-        console.error('Error:', err);
-      }
+      error: () => this.cargando = false
     });
   }
 
-  buscar(event: any) {
-    const texto = event.target.value;
-    if (texto && texto.trim() !== '') {
-      this.taskService.buscarNoticias(texto).subscribe(data => this.noticias = data);
-    } else {
-      this.cargarNoticias();
-    }
+  buscar(ev: any) {
+    this.textoBusqueda = ev.target.value || '';
+    this.cargarNoticias();
   }
 
-  cambiarOrden(event: any) {
-    const criterio = event.detail.value;
-    
-    // Creamos una copia nueva del array para que Angular detecte el cambio
-    const noticiasOrdenadas = [...this.noticias];
-
-    switch (criterio) {
-      case 'id_desc':
-        // De más nuevas a más viejas (asumiendo que el ID sube)
-        noticiasOrdenadas.sort((a, b) => Number(b.id) - Number(a.id));
-        break;
-        
-      case 'titulo_asc':
-        // Orden alfabético A-Z
-        noticiasOrdenadas.sort((a, b) => a.titulo.localeCompare(b.titulo));
-        break;
-
-      case 'autor_asc':
-        // Por nombre de autor
-        noticiasOrdenadas.sort((a, b) => a.autor.localeCompare(b.autor));
-        break;
-    }
-
-    // Reasignamos el array ordenado
-    this.noticias = noticiasOrdenadas;
+  cambiarOrden(ev: any) {
+    const parts = ev.detail.value.split('_');
+    this.campoOrden = parts[0];
+    this.sentidoOrden = parts[1];
+    this.cargarNoticias();
   }
 
-  toggleFormulario() {
-    this.mostrarFormulario = !this.mostrarFormulario;
-  }
+  toggleFormulario() { this.mostrarFormulario = !this.mostrarFormulario; }
 
-  async agregarNoticia() {
-    if (!this.nuevaNoticia.titulo?.trim()) {
-      this.mostrarToast('El título es obligatorio', 'warning');
+  agregarNoticia() {
+    // Validación básica
+    if (!this.nuevaNoticia.titulo || !this.nuevaNoticia.resumen) {
+      this.mostrarToast('Por favor, rellena título y resumen');
       return;
     }
 
-    const noticiaAGuardar: any = {
+    const noticiaAGuardar: Noticia = {
       titulo: this.nuevaNoticia.titulo,
-      resumen: this.nuevaNoticia.resumen || '',
-      autor: this.nuevaNoticia.autor || 'Anónimo',
-      imagenUrl: this.nuevaNoticia.imagenUrl || 'https://via.placeholder.com/150',
+      resumen: this.nuevaNoticia.resumen,
+      autor: this.nuevaNoticia.autor || 'Redacción', // Valor por defecto
+      imagenUrl: this.nuevaNoticia.imagenUrl || 'https://via.placeholder.com/400x200?text=Noticia', // Imagen por defecto
       fechaPublicacion: new Date().toISOString()
     };
 
     this.taskService.agregarNoticia(noticiaAGuardar).subscribe({
       next: () => {
-        this.mostrarToast('Noticia publicada con éxito', 'success');
-        this.nuevaNoticia = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
+        this.mostrarToast('¡Noticia añadida con éxito!');
         this.mostrarFormulario = false;
-        this.cargarNoticias();
-      },
-      error: () => this.mostrarToast('Error al guardar', 'danger')
-    });
-  }
-
-  eliminarNoticia(noticia: Noticia) {
-    if (!noticia.id) return;
-    this.taskService.eliminarNoticia(noticia.id.toString()).subscribe({
-      next: () => {
-        this.mostrarToast('Noticia eliminada', 'success');
-        this.cargarNoticias(); 
+        // Limpiamos el formulario
+        this.nuevaNoticia = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
+        this.cargarNoticias(); // Recarga la lista para ver la nueva
       }
     });
   }
 
-  async mostrarToast(mensaje: string, color: string) {
-    const toast = await this.toastController.create({
-      message: mensaje,
-      duration: 2000,
-      color: color,
-      position: 'bottom'
+  eliminarNoticia(noticia: Noticia) {
+  if (noticia.id === undefined) return;
+
+  console.log('Intentando borrar ID:', noticia.id);
+
+  this.taskService.eliminarNoticia(noticia.id).subscribe({
+    next: () => {
+      console.log('Borrado exitoso en el servidor');
+      this.mostrarToast('Noticia eliminada correctamente');
+      this.cargarNoticias(); // Refrescamos la lista
+    },
+    error: (err) => {
+      console.error('Error al borrar:', err);
+      this.mostrarToast('No se pudo borrar: ID no encontrado');
+    }
+  });
+}
+
+  doRefresh(ev: any) {
+    this.taskService.getNoticias().subscribe(data => {
+      this.noticias = [...data];
+      ev.target.complete();
     });
-    await toast.present();
   }
 
-  trackById(index: number, item: Noticia) {
-    return item.id;
+  async mostrarToast(m: string) {
+    const t = await this.toastController.create({ message: m, duration: 2000 });
+    await t.present();
   }
+
+  trackById(i: number, item: Noticia) { return item.id; }
 }
