@@ -4,11 +4,18 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { addIcons } from 'ionicons';
+import { Share } from '@capacitor/share';
+import { Haptics, ImpactStyle } from '@capacitor/haptics';
+import { pin, camera, shareSocial, pulse } from 'ionicons/icons';
+
+
 import { close, settingsOutline, add, searchOutline, filterOutline, trashOutline, createOutline } from 'ionicons/icons';
 
 import { TaskService } from '../services/task.service';
 import { SettingsService } from '../services/settings.services';
 import { Noticia } from '../interfaces/noticia';
+import { Camera, CameraResultType } from '@capacitor/camera';
+import { Geolocation } from '@capacitor/geolocation';
 import { TaskItemComponent } from '../components/task-item/task-noticia.component';
 
 @Component({
@@ -25,6 +32,8 @@ export class HomePage implements OnInit {
   nombre: string = 'Usuario';
   mostrarFormulario = false;
   cargando = true;
+  fotoUrl: string | undefined;
+  coordenadas: { lat: number, lng: number } | undefined;
 
   nuevaNoticia: Partial<Noticia> = { titulo: '', resumen: '', autor: '', imagenUrl: '' };
 
@@ -40,10 +49,45 @@ export class HomePage implements OnInit {
     this.cargarNombre();
     this.cargarNoticias();
   }
+  async tomarFoto() {
+    const image = await Camera.getPhoto({
+      quality: 90,
+      allowEditing: false,
+      resultType: CameraResultType.Uri
+    });
+    this.fotoUrl = image.webPath;
+  }
+
+  async obtenerUbicacion() {
+    const coordinates = await Geolocation.getCurrentPosition();
+    this.coordenadas = {
+      lat: coordinates.coords.latitude,
+      lng: coordinates.coords.longitude
+    };
+  }
+
+  abrirMapas() {
+    if (this.coordenadas) {
+      const url = `https://www.google.com/maps?q=${this.coordenadas.lat},${this.coordenadas.lng}`;
+      window.open(url, '_blank');
+    }
+  }
 
   async cargarNombre() {
     const n = await this.settingsService.getNombre();
     this.nombre = n || 'Usuario';
+  }
+  async compartirApp() {
+    await Share.share({
+      title: 'Mi App de Noticias',
+      text: 'Mira qué noticia acabo de publicar!',
+      url: 'http://miweb.com',
+      dialogTitle: 'Compartir con amigos',
+    });
+  }
+
+  async vibrar() {
+    await Haptics.impact({ style: ImpactStyle.Heavy });
   }
 
   public esqueletoCajas: number[] = [1, 2, 3, 4, 5, 6, 7, 8,9,10,11,12];

@@ -1,7 +1,6 @@
-<ion-header>
+<ion-header [translucent]="true">
   <ion-toolbar color="primary">
     <ion-title>Hola, {{ nombre }}</ion-title>
-
     <ion-buttons slot="end">
       <ion-button [routerLink]="['/settings']">
         <ion-icon name="settings-outline"></ion-icon>
@@ -13,7 +12,7 @@
     <ion-searchbar (ionInput)="buscar($event)" placeholder="Buscar..."></ion-searchbar>
   </ion-toolbar>
 
-  <ion-item>
+  <ion-item lines="full">
     <ion-label>Ordenar:</ion-label>
     <ion-select [value]="campoOrden + '_' + sentidoOrden" (ionChange)="cambiarOrden($event)">
       <ion-select-option value="id_desc">Recientes</ion-select-option>
@@ -22,7 +21,45 @@
   </ion-item>
 </ion-header>
 
-<ion-content>
+<ion-content [fullscreen]="true">
+  <ion-card class="native-card" style="margin: 16px; border-radius: 12px;">
+    <ion-card-header>
+      <ion-card-title>Funciones Nativas</ion-card-title>
+    </ion-card-header>
+    <ion-card-content>
+      <ion-row>
+        <ion-col size="6">
+          <ion-button expand="block" (click)="tomarFoto()">
+            <ion-icon name="camera" slot="start"></ion-icon> Foto
+          </ion-button>
+        </ion-col>
+        <ion-col size="6">
+          <ion-button expand="block" color="secondary" (click)="obtenerUbicacion()">
+            <ion-icon name="pin" slot="start"></ion-icon> GPS
+          </ion-button>
+        </ion-col>
+      </ion-row>
+      <ion-row class="ion-margin-top">
+          <ion-col size="6">
+            <ion-button expand="block" color="tertiary" (click)="compartirApp()" style="--border-radius: 10px;">
+              <ion-icon name="share-social" slot="start"></ion-icon> Compartir
+            </ion-button>
+          </ion-col>
+          <ion-col size="6">
+            <ion-button expand="block" color="warning" (click)="vibrar()" style="--border-radius: 10px;">
+              <ion-icon name="pulse" slot="start"></ion-icon> Vibrar
+            </ion-button>
+          </ion-col>
+        </ion-row>
+
+      <img *ngIf="fotoUrl" [src]="fotoUrl" style="width: 100%; border-radius: 8px; margin-top: 10px;" />
+
+      <div *ngIf="coordenadas" class="ion-margin-top ion-text-center">
+        <p>Lat: {{ coordenadas.lat }} | Lng: {{ coordenadas.lng }}</p>
+        <ion-button fill="clear" size="small" (click)="abrirMapas()">Ver en Google Maps</ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
 
   <ion-card *ngIf="mostrarFormulario">
     <ion-card-header>
@@ -33,15 +70,12 @@
       <ion-item>
         <ion-input [(ngModel)]="nuevaNoticia.titulo" placeholder="Título"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-textarea [(ngModel)]="nuevaNoticia.resumen" placeholder="Resumen"></ion-textarea>
       </ion-item>
-
       <ion-item>
         <ion-input [(ngModel)]="nuevaNoticia.autor" placeholder="Autor"></ion-input>
       </ion-item>
-
       <ion-item>
         <ion-input [(ngModel)]="nuevaNoticia.imagenUrl" placeholder="URL Imagen"></ion-input>
       </ion-item>
@@ -49,7 +83,6 @@
       <ion-button expand="block" (click)="guardarNoticia()">
         {{ noticiaEditandoId ? 'Guardar Cambios' : 'Publicar' }}
       </ion-button>
-
       <ion-button expand="block" fill="clear" color="medium" (click)="finalizarFormulario()">
         Cancelar
       </ion-button>
@@ -57,45 +90,39 @@
   </ion-card>
 
   <ion-grid>
-  <ion-row>
-    
-    <ng-container *ngIf="cargando">
-      <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let item of esqueletoCajas">
-        <ion-card class="noticia-card" style="margin: 4px; height: 350px;">
-          <ion-skeleton-text animated style="width: 100%; height: 150px; margin: 0;"></ion-skeleton-text>
-          
-          <div style="padding: 10px;">
-            <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 90%; height: 18px; margin-top: 10px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 100%; height: 10px; margin-top: 15px;"></ion-skeleton-text>
-            <ion-skeleton-text animated style="width: 70%; height: 10px;"></ion-skeleton-text>
-            
-            <div style="display: flex; justify-content: space-between; margin-top: 25px;">
-               <ion-skeleton-text animated style="width: 60%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
-               <ion-skeleton-text animated style="width: 20%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
+    <ion-row>
+      <ng-container *ngIf="cargando">
+        <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let item of esqueletoCajas">
+          <ion-card class="noticia-card" style="margin: 4px; height: 350px;">
+            <ion-skeleton-text animated style="width: 100%; height: 150px; margin: 0;"></ion-skeleton-text>
+            <div style="padding: 10px;">
+              <ion-skeleton-text animated style="width: 40%; height: 12px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 90%; height: 18px; margin-top: 10px;"></ion-skeleton-text>
+              <ion-skeleton-text animated style="width: 100%; height: 10px; margin-top: 15px;"></ion-skeleton-text>
+              <div style="display: flex; justify-content: space-between; margin-top: 25px;">
+                 <ion-skeleton-text animated style="width: 60%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
+                 <ion-skeleton-text animated style="width: 20%; height: 30px; border-radius: 4px;"></ion-skeleton-text>
+              </div>
             </div>
-          </div>
-        </ion-card>
-      </ion-col>
-    </ng-container>
+          </ion-card>
+        </ion-col>
+      </ng-container>
 
-    <ng-container *ngIf="!cargando">
-      <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let n of noticias; trackBy: trackById">
-        <app-task-item 
-          [noticia]="n" 
-          (eliminar)="eliminarNoticia(n)" 
-          (editar)="editarNoticia(n)">
-        </app-task-item>
-      </ion-col>
-    </ng-container>
-
-  </ion-row>
-</ion-grid>
+      <ng-container *ngIf="!cargando">
+        <ion-col size="6" size-sm="4" size-md="3" size-lg="2" *ngFor="let n of noticias; trackBy: trackById">
+          <app-task-item 
+            [noticia]="n" 
+            (eliminar)="eliminarNoticia(n)" 
+            (editar)="editarNoticia(n)">
+          </app-task-item>
+        </ion-col>
+      </ng-container>
+    </ion-row>
+  </ion-grid>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button (click)="toggleFormulario()">
       <ion-icon [name]="mostrarFormulario ? 'close' : 'add'"></ion-icon>
     </ion-fab-button>
   </ion-fab>
-
 </ion-content>

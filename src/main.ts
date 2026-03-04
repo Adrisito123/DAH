@@ -2,7 +2,8 @@ import { enableProdMode, importProvidersFrom } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
 import { RouteReuseStrategy, provideRouter } from '@angular/router';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
-
+import { defineCustomElements } from '@ionic/pwa-elements/loader';
+defineCustomElements(window);
 // IMPORTACIONES NECESARIAS
 import { provideHttpClient } from '@angular/common/http'; // Para el servidor REST
 import { IonicStorageModule } from '@ionic/storage-angular'; // Para el nombre y modo oscuro

@@ -24,3 +24,43 @@ ion-skeleton-text {
   border-radius: 12px;
   height: 380px; // La misma altura que definimos antes
 }
+/* Asegura que el contenido tenga un margen superior si el header es muy grande */
+ion-content {
+  --padding-top: 10px;
+  --padding-bottom: 20px;
+}
+
+/* Estilo para la tarjeta de Funciones Nativas (Cámara y GPS) */
+.native-card {
+  margin: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  background: var(--ion-color-light-tint);
+
+  ion-card-title {
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: var(--ion-color-primary);
+  }
+}
+
+/* Ajuste de la previsualización de la foto */
+.preview-img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-top: 12px;
+  border: 1px solid #ddd;
+}
+
+/* Mejora la separación del grid de noticias */
+ion-grid {
+  padding: 8px;
+}
+
+/* Estilo para el buscador para que no se pegue a los bordes */
+ion-searchbar {
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
+}
