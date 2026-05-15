@@ -1,0 +1,18 @@
+TITULO: 
+NotiYa - Noticias al Instante.
+
+DESCRIPCIÓN CORTA: 
+Tu fuente de noticias más rápida, fiable y personalizada. Directo a lo que importa.
+
+DESCRIPCIÓN LARGA:
+Bienvenido a NotiYa, la aplicación definitiva para estar informado en tiempo real. 
+Nuestra app ha sido diseñada para ofrecer una experiencia de lectura limpia y rápida, 
+permitiéndote navegar entre las noticias más relevantes del día sin distracciones.
+
+Con NotiYa puedes explorar diversas categorías como tecnología, deportes y economía. 
+Además, incluye un buscador avanzado para encontrar eventos específicos y un 
+sistema de filtrado inteligente.
+
+Hemos cuidado cada detalle visual, incluyendo un modo oscuro para proteger tu vista 
+y un diseño totalmente adaptativo (responsive) que se ajusta a cualquier dispositivo 
+Android. ¡No te pierdas nada de lo que ocurre a tu alrededor con NotiYa!
