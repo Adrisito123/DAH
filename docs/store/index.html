@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guía de Producción Técnica y Marketing: Éxito 10/10</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        }
+        
+        h1 {
+            color: #1e3a8a;
+            border-bottom: 3px solid #3b82f6;
+            padding-bottom: 15px;
+            font-size: 28px;
+            text-align: center;
+        }
+        
+        h2 {
+            color: #1e3a8a;
+            margin-top: 35px;
+            border-left: 5px solid #3b82f6;
+            padding-left: 12px;
+            font-size: 20px;
+        }
+        
+        h3 {
+            color: #2563eb;
+            font-size: 16px;
+            margin-top: 20px;
+        }
+        
+        p,
+        li {
+            font-size: 15px;
+            color: #4b5563;
+        }
+        
+        code {
+            background-color: #f1f5f9;
+            color: #db2777;
+            padding: 3px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+        }
+        
+        pre {
+            background: #1e293b;
+            color: #f8fafc;
+            padding: 15px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-size: 13px;
+        }
+        
+        pre code {
+            background: none;
+            color: #f8fafc;
+            padding: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 12px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f8fafc;
+            color: #1e3a8a;
+            font-weight: bold;
+        }
+        
+        tr:nth-child(even) {
+            background-color: #fcfdfe;
+        }
+        
+        .alert-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+        
+        .success-box {
+            background-color: #f0fdf4;
+            border-left: 4px solid #22c55e;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="container">
+        <h1>Guía Técnica de Producción y Marketing para Aplicaciones Móviles</h1>
+        <p>Esta guía detalla de forma puramente técnica y procedimental cómo resolver los cuatro elementos críticos exigidos por la rúbrica para alcanzar la calificación máxima de 10 puntos (RA5.ce2 y RA5.ce5).</p>
+
+        <h2>1. Iconos de la Aplicación (Adaptive Icons para Android)</h2>
+        <p>Google Play exige iconos adaptativos. Esto significa que el icono se compone de dos capas independientes (primer plano y fondo) para que el sistema operativo pueda aplicar efectos de paralaje, máscaras de recorte y animaciones dinámicas según
+            el fabricante.</p>
+
+        <h3>Requisitos de Archivos Fuente:</h3>
+        <ul>
+            <li><code>icon-foreground.png</code> (Capa de primer plano): Tamaño obligatorio de <strong>1024x1024 px</strong> con fondo transparente. El logotipo o elemento visual clave debe estar estrictamente dentro del "área segura" central (círculo central
+                de 660 px de diámetro) para evitar recortes forzados.</li>
+            <li><code>icon-background.png</code> (Capa de fondo): Tamaño de <strong>1024x1024 px</strong>. Un color sólido o un patrón texturizado sin logotipos ni letras.</li>
+        </ul>
+
+        <h3>Procedimiento Automático de Generación (Capacitor Asset Tool):</h3>
+        <ol>
+            <li>Crea una carpeta llamada <code>assets</code> en la raíz de tu proyecto Capacitor/Ionic.</li>
+            <li>Guarda dentro de ella tus archivos <code>icon-foreground.png</code> e <code>icon-background.png</code>.</li>
+            <li>Instala global o localmente la utilidad oficial ejecutando en tu terminal:
+                <pre><code>npm install @capacitor/assets --save-dev</code></pre>
+            </li>
+            <li>Ejecuta el comando de generación para inyectar los recursos automáticamente en el proyecto nativo de Android:
+                <pre><code>npx capacitor-assets generate --android</code></pre>
+            </li>
+        </ol>
+        <p><strong>Resultado en el proyecto:</strong> Este comando crea de forma limpia todas las densidades requeridas (<code>mdpi</code>, <code>hdpi</code>, <code>xhdpi</code>, <code>xxhdpi</code>, <code>xxxhdpi</code>) dentro del directorio nativo <code>android/app/src/main/res/</code>            eliminando permanentemente los assets por defecto de Ionic.</p>
+
+        <h2>2. Pantalla de Bienvenida (Splash Screen Eficiente)</h2>
+        <p>La pantalla de inicio/bienvenida evita que el usuario visualice un lienzo en blanco mientras el motor web de Capacitor carga el bundle de JavaScript en memoria.</p>
+
+        <h3>Requisitos del Archivo Fuente:</h3>
+        <ul>
+            <li><code>splash.png</code>: Una imagen de <strong>2732x2732 px</strong>. Debe tener un diseño centrado con un margen de seguridad masivo a los lados, ya que la imagen se recortará dinámicamente según la relación de aspecto del dispositivo (pantallas
+                panorámicas, tablets o móviles plegables).</li>
+        </ul>
+
+        <h3>Procedimiento de Generación e Integración:</h3>
+        <ol>
+            <li>Coloca el archivo <code>splash.png</code> dentro de la carpeta <code>assets/</code> creada anteriormente.</li>
+            <li>Ejecuta el generador de assets para procesar y compilar la splash screen:
+                <pre><code>npx capacitor-assets generate --android</code></pre>
+            </li>
+            <li>Para asegurar que la transición entre la pantalla nativa y la web app sea fluida sin parpadeos blancos, instala el plugin oficial de Capacitor Splash Screen:
+                <pre><code>npm install @capacitor/splash-screen
+npx cap sync android</code></pre>
+            </li>
+            <li>Configura el comportamiento en el archivo de configuración de tu proyecto (<code>capacitor.config.json</code>):
+                <pre><code>{
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 2000,
+      "launchAutoHide": true,
+      "backgroundColor": "#1e3a8a",
+      "androidSplashResourceName": "splash",
+      "showSpinner": false
+    }
+  }
+}</code></pre>
+            </li>
+        </ol>
+
+        <h2>3. Vídeo de Demostración Promocional</h2>
+        <p>Para cumplir el criterio de marketing sin un presupuesto comercial, debes enfocar el vídeo como un <em>screencast técnico/comercial</em> de alta fidelidad con una duración ideal de <strong>30 a 45 segundos</strong>.</p>
+
+        <h3>Guion Técnico de Grabación (Estructura de Tres Actos):</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Segmento</th>
+                    <th>Duración</th>
+                    <th>Acción Visual en la App</th>
+                    <th>Objetivo Técnico (Rúbrica)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>01. Gancho / Inicio</strong></td>
+                    <td>0:00 - 0:07</td>
+                    <td>Apertura de la app desde el escritorio móvil. Se aprecia el icono personalizado y la Splash Screen cargando instantáneamente.</td>
+                    <td>Demostrar la correcta integración estética nativa del sistema.</td>
+                </tr>
+                <tr>
+                    <td><strong>02. Flujo Principal</strong></td>
+                    <td>0:07 - 0:25</td>
+                    <td>Uso de la funcionalidad core: El usuario abre la cámara, toma una foto geolocalizada e inmediatamente se renderiza un pin en el mapa interactivo.</td>
+                    <td>Validar el funcionamiento libre de fallos de los plugins de Hardware (Cámara, GPS).</td>
+                </tr>
+                <tr>
+                    <td><strong>03. Llamada a la Acción</strong></td>
+                    <td>0:25 - 0:35</td>
+                    <td>Cierre mostrando un plano limpio de la interfaz y un rótulo con la URL de descarga (GitHub Pages).</td>
+                    <td>Cerrar el ciclo de la estrategia de marketing y distribución.</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <h3>Herramientas y Producción Recomendadas:</h3>
+        <ul>
+            <li><strong>Captura:</strong> Utiliza el grabador de pantalla nativo de Android o el comando <code>adb shell screenrecord /sdcard/demo.mp4</code> desde tu terminal conectado por depuración USB para obtener la máxima tasa de frames sin compresión
+                destructiva.</li>
+            <li><strong>Postproducción:</strong> Importa el archivo en CapCut, Canva o Clipchamp. Añade un lienzo de fondo con un mockup (marco de smartphone), recorta los tiempos muertos de carga (como el retraso de enfoque de la cámara) y añade textos cortos
+                en tipografía moderna que rotulen la acción ("Captura", "Geolocaliza", "Navega"). Exporta estrictamente a <strong>1080p, 60fps, formato H.264/MP4</strong>.</li>
+        </ul>
+
+        <h2>4. Página Web de Publicidad (Landing Page de Conversión)</h2>
+        <p>La Landing Page debe ser una sola página estática y ligera orientada puramente a la descarga directa del instalador. Para obtener la máxima puntuación en marketing (RA5.ce5), debe alojarse directamente en <strong>GitHub Pages</strong> dentro del
+            mismo repositorio de tu proyecto en la carpeta <code>/docs</code>.</p>
+
+        <h3>Estructura del Código Fuente de Producción (Tailwind CSS nativo por CDN):</h3>
+        <p>Crea un archivo llamado <code>index.html</code> y pega el siguiente código estándar profesional listo para producción:</p>
+
+        <pre><code>&lt;!DOCTYPE html&gt;
+&lt;html lang="es"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;GeoCam App - Captura tu Mundo&lt;/title&gt;
+    &lt;script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body class="bg-slate-900 text-slate-100 antialiased"&gt;
+
+    &lt;!-- Hero Section --&gt;
+    &lt;header class="max-w-6xl mx-auto px-6 py-20 flex flex-col md:flex-row items-center justify-between"&gt;
+        &lt;div class="md:w-1/2 space-y-6 text-center md:text-left"&gt;
+            &lt;span class="bg-indigo-500/10 text-indigo-400 text-xs font-bold uppercase tracking-widest px-3 py-1 rounded-full border border-indigo-500/20"&gt;Nueva Versión 1.0.0 Stable&lt;/span&gt;
+            &lt;h1 class="text-4xl md:text-6xl font-extrabold tracking-tight bg-gradient-to-r from-white to-slate-400 bg-clip-text text-transparent"&gt;Fotografía inteligente con Geolocalización.&lt;/h1&gt;
+            &lt;p class="text-lg text-slate-400"&gt;La herramienta definitiva para profesionales de campo. Captura imágenes de alta resolución indexadas con coordenadas GPS precisas y visualízalas al instante en mapas dinámicos en tiempo real.&lt;/p&gt;
+            &lt;div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start"&gt;
+                &lt;a href="./app-release.aab" download class="bg-indigo-600 hover:bg-indigo-500 text-white font-semibold px-8 py-4 rounded-xl shadow-lg shadow-indigo-600/30 transition duration-300 text-center"&gt;Descargar Android Bundle (.AAB)&lt;/a&gt;
+                &lt;a href="#video" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold px-8 py-4 rounded-xl border border-slate-700 transition duration-300 text-center"&gt;Ver Vídeo Demo&lt;/a&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+        &lt;div class="md:w-1/2 mt-12 md:mt-0 flex justify-center relative"&gt;
+            &lt;div class="absolute w-72 h-72 bg-indigo-500/20 rounded-full blur-3xl -z-10"&gt;&lt;/div&gt;
+            &lt;div class="w-64 h-[500px] bg-slate-950 rounded-[40px] p-3 border-4 border-slate-800 shadow-2xl overflow-hidden flex flex-col justify-between text-center"&gt;
+                &lt;div class="w-20 h-4 bg-slate-800 mx-auto rounded-full mt-1"&gt;&lt;/div&gt;
+                &lt;div class="my-auto p-4"&gt;
+                    &lt;div class="w-16 h-16 bg-indigo-600 rounded-2xl mx-auto shadow-xl flex items-center justify-center text-2xl font-bold"&gt;📸&lt;/div&gt;
+                    &lt;h3 class="mt-4 font-bold text-white text-xl"&gt;GeoCam App&lt;/h3&gt;
+                    &lt;p class="text-xs text-slate-500 mt-1"&gt;Lat: 37.3891&lt;br&gt;Lon: -5.9845&lt;/p&gt;
+                &lt;/div&gt;
+                &lt;div class="w-1/2 h-1 bg-slate-800 mx-auto mb-2 rounded-full"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/header&gt;
+
+    &lt;!-- Video Section --&gt;
+    &lt;section id="video" class="bg-slate-950 py-20 border-y border-slate-800"&gt;
+        &lt;div class="max-w-4xl mx-auto px-6 text-center"&gt;
+            &lt;h2 class="text-3xl font-bold text-white mb-4 border-none p-0 inline-block"&gt;Mira la aplicación en acción&lt;/h2&gt;
+            &lt;p class="text-slate-400 mb-10 max-w-xl mx-auto"&gt;Descubre en menos de un minuto cómo interactúan el hardware de la cámara nativa y los mapas vectoriales del dispositivo.&lt;/p&gt;
+            &lt;div class="aspect-video w-full rounded-2xl bg-slate-900 border border-slate-800 shadow-inner overflow-hidden flex items-center justify-center text-slate-600 relative"&gt;
+                &lt;!-- Reemplazar src por el enlace a tu vídeo subido a YouTube o local --&gt;
+                &lt;iframe class="w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Demo Video" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen&gt;&lt;/iframe&gt;
+            &lt;/div&gt;
+        &lt;/div&gt;
+    &lt;/section&gt;
+
+    &lt;!-- Footer / Politicas --&gt;
+    &lt;footer class="max-w-6xl mx-auto px-6 py-12 text-center text-sm text-slate-500 space-y-4"&gt;
+        &lt;p&gt;&amp;copy; 2026 GeoCam Project. Desarrollado bajo directrices estrictas de la especificación RA5.&lt;/p&gt;
+        &lt;div class="flex justify-center gap-6"&gt;
+            &lt;a href="#" class="hover:text-slate-400 transition"&gt;Política de Privacidad&lt;/a&gt;
+            &lt;a href="#" class="hover:text-slate-400 transition"&gt;Términos de Uso&lt;/a&gt;
+        &lt;/div&gt;
+    &lt;/footer&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+
+        <h3>Estrategia de Despliegue en un Click:</h3>
+        <ol>
+            <li>Crea una carpeta llamada <code>docs</code> en la raíz de tu proyecto donde tienes el archivo <code>package.json</code>.</li>
+            <li>Guarda el código anterior como <code>docs/index.html</code>.</li>
+            <li>Pon tu archivo ejecutable compilado <code>app-release.aab</code> dentro de la misma carpeta <code>docs/</code>. De este modo, el botón de descarga del instalador funcionará de manera local e inmediata sin enlaces caídos.</li>
+            <li>Haz un commit y push de tus cambios a tu repositorio de GitHub.</li>
+            <li>Entra en la configuración de tu repositorio en GitHub (<strong>Settings &gt; Pages</strong>), bajo la opción "Build and deployment", selecciona la rama principal (<code>main</code> o <code>master</code>) y cambia explícitamente la carpeta
+                de despliegue de <code>/ (root)</code> a <code>/docs</code>. Haz clic en guardar.</li>
+        </ol>
+        <p class="success-box"><strong>¡Listo!</strong> En menos de 2 minutos tu web de publicidad estará online en una URL pública parecida a <code>https://tu-usuario.github.io/tu-repositorio/</code>, cumpliendo a la perfección el criterio de máxima nota para marketing de
+            la ficha técnica.</p>
+    </div>
+
+</body>
+
+</html>
