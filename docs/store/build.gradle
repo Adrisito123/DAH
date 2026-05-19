@@ -1,5 +1,5 @@
 defaultConfig {
-       applicationId "com.your_name.sportsnews"
+       applicationId "com.noticiasPro.sportsnews"
        minSdkVersion localProperties.getProperty('android.minSdk').toInteger()
        targetSdkVersion localProperties.getProperty('android.targetSdk').toInteger()
        versionCode 1
